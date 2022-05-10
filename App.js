@@ -6,6 +6,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './screens/Login';
 import { useEffect, useState } from 'react';
+import ChatScreen from './screens/ChatScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import NotificationScreen from './screens/NotificationScreen';
 
 export default function App() {
   const Stack = createNativeStackNavigator()
@@ -13,7 +16,7 @@ export default function App() {
 
   const loginHandler = useEffect(() => {
     const data = async () => {
-      const res = await fetch('http://192.168.1.8:8000/signin', {
+      const res = await fetch('http://192.168.1.7:8000/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,25 +39,57 @@ export default function App() {
   return (
     <NavigationContainer>
       <SafeAreaProvider>
-        <Stack.Navigator>
-          {
-            logged ? (<Stack.Screen
-              name='HomeScreen'
-              component={HomeScreen}
-              options={{
-                headerShown: false
-              }}
-            />) : (<Stack.Screen
-              name='Login'
-              component={Login}
-              options={{
-                headerShown: false
-              }}
-            />)
-          }
+
+        {
+          logged ? (
+            <Stack.Navigator>
+              <Stack.Screen
+                name='HomeScreen'
+                component={HomeScreen}
+                options={{
+                  headerShown: false
+                }}
+              />
+              <Stack.Screen
+                name='ChatScreen'
+                component={ChatScreen}
+                options={{
+                  headerShown: false
+                }}
+
+              />
+              <Stack.Screen
+                name='NotificationScreen'
+                component={NotificationScreen}
+                options={{
+                  headerShown: false
+                }}
+              />
+              <Stack.Screen
+                name='ProfileScreen'
+                component={ProfileScreen}
+                options={{
+                  headerShown: false
+                }}
+              />
+            </Stack.Navigator>
+
+          ) : (
+            <Stack.Navigator>
+
+              <Stack.Screen
+                name='Login'
+                component={Login}
+                options={{
+                  headerShown: false
+                }}
+              />
+            </Stack.Navigator>
+
+          )
+        }
 
 
-        </Stack.Navigator>
       </SafeAreaProvider>
     </NavigationContainer>
   );
