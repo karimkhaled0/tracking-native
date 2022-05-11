@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import ChatScreen from './screens/ChatScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import NotificationScreen from './screens/NotificationScreen';
+import * as SecureStore from 'expo-secure-store';
+
 
 export default function App() {
   const Stack = createNativeStackNavigator()
@@ -23,11 +25,12 @@ export default function App() {
           'authorization': `Bearer ${process.env.LOGTAIL_TOKEN}`
         },
         body: JSON.stringify({
-          loginId: '201910112',
+          loginId: '201910115',
           password: '123456789'
         })
 
       }).then((t) => t.json())
+      await SecureStore.setItemAsync('userToken', res.token);
       if (res.token) {
         setLogged(true)
       } else {
@@ -36,6 +39,7 @@ export default function App() {
     }
     data()
   }, [])
+
   return (
     <NavigationContainer>
       <SafeAreaProvider>
