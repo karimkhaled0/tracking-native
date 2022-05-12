@@ -3,7 +3,6 @@ import React from 'react'
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
-import NavOptions from '../components/NavOptions';
 
 const ChatScreen = () => {
     const navigation = useNavigation()

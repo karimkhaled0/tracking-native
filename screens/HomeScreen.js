@@ -1,62 +1,19 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Button, TouchableOpacity, FlatList } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, View, SafeAreaView, Image, Button, TouchableOpacity, FlatList, RefreshControl, SectionList } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import tw from 'twrnc';
-import NavOptions from '../components/NavOptions';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
-import * as SecureStore from 'expo-secure-store';
-import moment from 'moment';
+import TaskSections from '../components/TaskSections';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import TaskView from '../components/TaskView';
+
 
 const HomeScreen = () => {
     const [progress, setProgress] = useState(true)
     const [review, setReview] = useState(false)
     const [completed, setCompleted] = useState(false)
-    const [userData, setUserData] = useState([])
-    const [tasks, setTasks] = useState([])
-    const getUser = useEffect(() => {
-        const data = async () => {
-            let token = await SecureStore.getItemAsync('userToken');
-            const res = await fetch('http://192.168.1.7:8000/api/user/me', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                },
-            }).then((t) => t.json())
-            setUserData(res.data)
-            const ress = await fetch('http://192.168.1.7:8000/api/task', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': `Bearer ${token}`
-                },
-            }).then((t) => t.json())
-            ress?.tasks?.map((item) => {
-                if (item.techId._id === res.data._id) {
-                    return setTasks(oldArray => [...oldArray, item])
-                } else {
-                    return
-                }
-            })
-        }
-        data()
-    }, [])
-
-    const updateReview = async () => {
-
-        const res = await fetch('http://192.168.1.7:8000/api/task/627ba5caa968fd84da935ea6', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNTExYjVhZTFjNzIyMmUwMzY0ZjNhMiIsImlhdCI6MTY1MjI3MDQzNSwiZXhwIjoxNjUyMzU2ODM1fQ.6nTI9oLMFdMJ4avDpJHoxJpu6T5HiUzPjNSUU4V9hhg`
-            },
-            body: JSON.stringify({
-                inReview: true,
-                inProgress: false
-            })
-        }).then((t) => t.json())
-    }
 
     const progressHandler = () => {
         setProgress(true)
@@ -74,14 +31,13 @@ const HomeScreen = () => {
         setCompleted(true)
     }
     const navigation = useNavigation()
-    console.log(tasks)
+
     return (
         <SafeAreaView
-            style={tw.style('bg-white h-full p-5', {
+            style={tw.style('bg-white h-full p-5 pt-10 mt-2', {
                 justifyContent: "flex-start"
             })}
         >
-            <Text style={tw`text-center text-xl mt-10 mb-5`}>Tasks</Text>
             {/* Tasks Sections */}
             <View
                 style={tw.style('flex-row', {
@@ -107,102 +63,37 @@ const HomeScreen = () => {
                     <Text style={completed ? tw`text-lg mt-2 font-semibold bg-[#4A649F] text-white pl-4 pr-4 pt-2 pb-2 rounded-lg text-center` : tw`text-lg mt-2 font-semibold bg-white text-[#4A649F] pl-4 pr-4 pt-2 pb-2 rounded-lg text-center`}>Completed</Text>
                 </TouchableOpacity>
             </View>
-            {/* Tasks */}
             {/* Progress Task */}
             {
                 progress ? (
 
-                    <FlatList // loop on data 
-                        data={tasks} // data 
-                        keyExtractor={(item) => item._id} // key
-                        renderItem={({ item }) => {
-                            if (item.inProgress) {
-                                return ( // render items implement
-                                    //   make click opacity animation
-                                    // Component
-                                    <View
-                                        style={tw.style('h-40 w-full mt-5 mr-2 ml-2 border-b border-[#4A649F]', {
-                                        })}>
-                                        {/* Location */}
-                                        <View
-                                            style={tw.style('flex-row mr-2 text-center', {
-                                            })}
-                                        >
-                                            <Icon
-                                                style={
-                                                    tw.style('p-2  bg-white', {
-                                                    })
-                                                }
-                                                type='feather'
-                                                name='map-pin'
-                                                color='#4A649F'
-                                                size={20}
-                                            />
-                                            <Text style={
-                                                tw.style('p-2 w-72  ', {
-                                                })
-                                            }>{item.location}</Text>
-                                        </View>
-                                        {/* Date */}
-                                        <View
-                                            style={tw.style('flex-row mr-2 text-center', {
-                                            })}
-                                        >
-                                            <Icon
-                                                style={
-                                                    tw.style('p-2  bg-white', {
-                                                    })
-                                                }
-                                                type='feather'
-                                                name='calendar'
-                                                color='#4A649F'
-                                                size={20}
-                                            />
-                                            <Text style={
-                                                tw.style('p-2 w-72  ', {
-                                                })
-                                            }>{moment(item.endDate).format('DD/MM/yyyy')}</Text>
-                                        </View>
-                                        {/* Description */}
-                                        <View
-                                            style={tw.style('flex-row mr-2 text-center', {
-                                            })}
-                                        >
-                                            <Icon
-                                                style={
-                                                    tw.style('p-2 bg-white', {
-                                                    })
-                                                }
-                                                type='feather'
-                                                name='align-left'
-                                                color='#4A649F'
-                                                size={20}
-                                            />
-                                            <ScrollView style={
-                                                tw.style('p-2 pb-2 w-72 h-15', {
-                                                })
-                                            }>
-                                                <Text>{item.description}</Text>
-
-                                            </ScrollView>
-                                        </View>
-                                    </View>
-                                )
-                            }
-                        }}
+                    <TaskSections
+                        inProgress={progress}
+                        inReview={review}
+                        completed={completed}
                     />
                 ) : null
             }
             {/* Review Task */}
             {
                 review ? (
-                    <Button
-                        title='hi'
-                        onPress={updateReview}
+                    <TaskSections
+                        inProgress={progress}
+                        inReview={review}
+                        completed={completed}
                     />
                 ) : null
             }
             {/* Completed Task */}
+            {
+                completed ? (
+                    <TaskSections
+                        inProgress={progress}
+                        inReview={review}
+                        completed={completed}
+                    />
+                ) : null
+            }
             {/* HomeIcons */}
             <View
                 style={tw.style('flex-row', {

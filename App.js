@@ -10,10 +10,35 @@ import ChatScreen from './screens/ChatScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import NotificationScreen from './screens/NotificationScreen';
 import * as SecureStore from 'expo-secure-store';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import TaskView from './components/TaskView';
+const Stack = createNativeStackNavigator()
 
 
+// Home Stacks
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={{ animationEnabled: false }}>
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="TaskView"
+        component={TaskView}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  )
+}
+// App Tabs bottom
 export default function App() {
-  const Stack = createNativeStackNavigator()
+  const Tab = createBottomTabNavigator();
   const [logged, setLogged] = useState(false)
 
   const loginHandler = useEffect(() => {
@@ -43,57 +68,63 @@ export default function App() {
   return (
     <NavigationContainer>
       <SafeAreaProvider>
-
         {
           logged ? (
-            <Stack.Navigator>
-              <Stack.Screen
+            <Tab.Navigator>
+              <Tab.Screen
                 name='HomeScreen'
-                component={HomeScreen}
+                component={HomeStack}
                 options={{
-                  headerShown: false
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
+
                 }}
               />
-              <Stack.Screen
+              <Tab.Screen
                 name='ChatScreen'
                 component={ChatScreen}
                 options={{
-                  headerShown: false
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
                 }}
 
               />
-              <Stack.Screen
+              <Tab.Screen
                 name='NotificationScreen'
                 component={NotificationScreen}
                 options={{
-                  headerShown: false
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
                 }}
               />
-              <Stack.Screen
+              <Tab.Screen
                 name='ProfileScreen'
                 component={ProfileScreen}
                 options={{
-                  headerShown: false
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
                 }}
               />
-            </Stack.Navigator>
-
+            </Tab.Navigator>
           ) : (
-            <Stack.Navigator>
-
-              <Stack.Screen
-                name='Login'
+            <Tab.Navigator>
+              <Tab.Screen
+                name='loginScreen'
                 component={Login}
                 options={{
-                  headerShown: false
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
+
                 }}
               />
-            </Stack.Navigator>
-
+            </Tab.Navigator>
           )
         }
-
-
       </SafeAreaProvider>
     </NavigationContainer>
   );
