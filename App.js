@@ -12,6 +12,7 @@ import NotificationScreen from './screens/NotificationScreen';
 import * as SecureStore from 'expo-secure-store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TaskView from './components/TaskView';
+import TaskStarted from './components/TaskStarted';
 const Stack = createNativeStackNavigator()
 
 
@@ -33,6 +34,13 @@ function HomeStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="TaskStarted"
+        component={TaskStarted}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   )
 }
@@ -43,7 +51,7 @@ export default function App() {
 
   const loginHandler = useEffect(() => {
     const data = async () => {
-      const res = await fetch('http://192.168.1.7:8000/signin', {
+      const res = await fetch('http://192.168.1.2:8000/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +80,7 @@ export default function App() {
           logged ? (
             <Tab.Navigator>
               <Tab.Screen
-                name='HomeScreen'
+                name='HomeStack'
                 component={HomeStack}
                 options={{
                   headerShown: false,

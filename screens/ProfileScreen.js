@@ -36,7 +36,7 @@ const ProfileScreen = () => {
                     type='font-awesome-5'
                     name='tasks'
                     color='black'
-                    onPress={() => navigation.navigate('HomeScreen')}
+                    onPress={() => navigation.navigate('HomeStack')}
 
                 />
                 <Icon

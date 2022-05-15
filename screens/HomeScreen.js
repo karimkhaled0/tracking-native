@@ -8,13 +8,58 @@ import TaskSections from '../components/TaskSections';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TaskView from '../components/TaskView';
-
+import * as SecureStore from 'expo-secure-store';
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
 
 const HomeScreen = () => {
     const [progress, setProgress] = useState(true)
     const [review, setReview] = useState(false)
     const [completed, setCompleted] = useState(false)
 
+    const [userData, setUserData] = useState([])
+    const [tasks, setTasks] = useState([])
+
+    const [refreshing, setRefreshing] = useState(false);
+
+
+    // on refresh function
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
+
+    // Fetch userData and tasks
+    const getUser = useEffect(() => {
+        setTasks([])
+        const data = async () => {
+            let token = await SecureStore.getItemAsync('userToken');
+            const res = await fetch('http://192.168.1.2:8000/api/user/me', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+            }).then((t) => t.json())
+            setUserData(res.data)
+            const ress = await fetch('http://192.168.1.2:8000/api/task', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+            }).then((t) => t.json())
+            ress?.tasks?.map((item) => {
+                if (item.techId._id === res.data._id) {
+                    return setTasks(oldArray => [...oldArray, item])
+                } else {
+                    return
+                }
+            })
+        }
+        data()
+    }, [refreshing])
     const progressHandler = () => {
         setProgress(true)
         setReview(false)
@@ -31,7 +76,6 @@ const HomeScreen = () => {
         setCompleted(true)
     }
     const navigation = useNavigation()
-
     return (
         <SafeAreaView
             style={tw.style('bg-white h-full p-5 pt-10 mt-2', {
@@ -66,31 +110,88 @@ const HomeScreen = () => {
             {/* Progress Task */}
             {
                 progress ? (
-
-                    <TaskSections
-                        inProgress={progress}
-                        inReview={review}
-                        completed={completed}
+                    <FlatList // loop on data 
+                        data={tasks} // data 
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                        keyExtractor={(item) => item._id}
+                        renderItem={({ item }) => {
+                            if (item.inProgress) {
+                                return (
+                                    <TaskSections
+                                        item={item}
+                                        location={item.location}
+                                        endDate={item.endDate}
+                                        description={item.description}
+                                        id={item._id}
+                                    />
+                                )
+                            }
+                        }
+                        }
                     />
+
                 ) : null
             }
             {/* Review Task */}
             {
                 review ? (
-                    <TaskSections
-                        inProgress={progress}
-                        inReview={review}
-                        completed={completed}
+                    <FlatList // loop on data 
+                        data={tasks} // data 
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                        keyExtractor={(item) => item._id}
+                        renderItem={({ item }) => {
+                            if (item.inReview) {
+                                return (
+                                    <TaskSections
+                                        item={item}
+                                        location={item.location}
+                                        endDate={item.endDate}
+                                        description={item.description}
+                                        id={item._id}
+                                    />
+                                )
+                            }
+                        }
+                        }
                     />
                 ) : null
             }
             {/* Completed Task */}
             {
                 completed ? (
-                    <TaskSections
-                        inProgress={progress}
-                        inReview={review}
-                        completed={completed}
+                    <FlatList // loop on data 
+                        data={tasks} // data 
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                        keyExtractor={(item) => item._id}
+                        renderItem={({ item }) => {
+                            if (item.finished) {
+                                return (
+                                    <TaskSections
+                                        item={item}
+                                        location={item.location}
+                                        endDate={item.endDate}
+                                        description={item.description}
+                                        id={item._id}
+                                    />
+                                )
+                            }
+                        }
+                        }
                     />
                 ) : null
             }
