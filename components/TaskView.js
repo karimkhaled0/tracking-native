@@ -31,22 +31,8 @@ const TaskView = ({ route }) => {
         data()
     }, [])
 
-    const startTask = async () => {
-        // let token = await SecureStore.getItemAsync('userToken');
-        // const ress = await fetch(`http://192.168.1.2:8000/api/task/${route.params.id}`, {
-        //     method: 'GET',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'authorization': `Bearer ${token}`
-        //     },
-        //     body: JSON.stringify({
-        //         started: true,
-        //     })
-        // }).then((t) => t.json())
-        navigation.navigate('TaskStarted')
-    }
-    const navigation = useNavigation()
 
+    const navigation = useNavigation()
     return (
         <ScrollView
             style={tw.style('bg-gray-100', {
@@ -216,14 +202,29 @@ const TaskView = ({ route }) => {
                                         </View>
                                     </View>
                                     {/* Button */}
-                                    <View style=
-                                        {tw.style('mt-15 mb-10', {
-                                            justifyContent: "center",
-                                            zIndex: 3
+                                    {
+                                        item.started ? (
+                                            <View style=
+                                                {tw.style('mt-15 mb-10', {
+                                                    justifyContent: "center",
+                                                    zIndex: 3
 
-                                        })}>
-                                        <Button title="Start the task" type="solid" onPress={startTask} buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
-                                    </View>
+                                                })}>
+                                                <Button title="Finish the task" type="outline" onPress={() => navigation.navigate('Report')} buttonStyle={tw`ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                            </View>
+                                        ) : (
+                                            <View style=
+                                                {tw.style('mt-15 mb-10', {
+                                                    justifyContent: "center",
+                                                    zIndex: 3
+
+                                                })}>
+                                                <Button title="Start the task" type="solid" onPress={() => navigation.navigate('TaskStarted', {
+                                                    id: route.params.id
+                                                })} buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                            </View>
+                                        )
+                                    }
                                 </View>
                             </View>
                         )

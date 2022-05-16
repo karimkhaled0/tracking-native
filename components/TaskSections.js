@@ -8,7 +8,6 @@ import { useNavigation } from '@react-navigation/native';
 import TaskView from './TaskView';
 
 
-// Task view need to be implemented search for navigation params passed to it
 const TaskSections = ({ location, endDate, description, id }) => {
     const navigation = useNavigation()
     return ( // render items implement

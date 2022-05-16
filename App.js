@@ -13,6 +13,7 @@ import * as SecureStore from 'expo-secure-store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TaskView from './components/TaskView';
 import TaskStarted from './components/TaskStarted';
+import Report from './components/Report';
 const Stack = createNativeStackNavigator()
 
 
@@ -37,6 +38,13 @@ function HomeStack() {
       <Stack.Screen
         name="TaskStarted"
         component={TaskStarted}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="Report"
+        component={Report}
         options={{
           headerShown: false,
         }}
