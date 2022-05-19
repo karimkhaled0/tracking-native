@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, SafeAreaView, Image, Button, TouchableOpacity, 
 import React, { useCallback, useEffect, useState } from 'react'
 import tw from 'twrnc';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { Icon } from '@rneui/base';
+import { BackgroundImage, Icon } from '@rneui/base';
 import { ScrollView } from 'react-native-gesture-handler';
 import TaskSections from '../components/TaskSections';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -27,7 +27,7 @@ const HomeScreen = () => {
     // on refresh function
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        wait(2000).then(() => setRefreshing(false));
+        wait(1000).then(() => setRefreshing(false));
     }, []);
 
     // Fetch userData and tasks
@@ -60,6 +60,7 @@ const HomeScreen = () => {
         }
         data()
     }, [refreshing])
+
     const progressHandler = () => {
         setProgress(true)
         setReview(false)

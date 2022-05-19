@@ -1,11 +1,16 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import tw from 'twrnc';
 import { BackgroundImage } from '@rneui/base';
 import { TextInput } from 'react-native-gesture-handler';
 import { Button, Input } from '@rneui/themed';
+import { useNavigation } from '@react-navigation/native';
+
 // need to fetch report and edit in review
-const Report = () => {
+const Report = ({ id, taskReport, route }) => {
+    const navigation = useNavigation()
+    const [report, setReport] = useState('')
+
     return (
         <View
             style={tw`bg-[#4A649F] h-full`}
@@ -33,10 +38,12 @@ const Report = () => {
                 {/* TextArea */}
                 <ScrollView>
                     <TextInput
+                        value={report}
                         style={tw.style('bg-white rounded-lg w-96 p-3 h-80 text-lg', {
                             textAlignVertical: 'top'
                         })}
                         multiline={true}
+                        onChangeText={(text) => setReport(text)}
                     />
                 </ScrollView>
                 {/* Button  */}
@@ -44,7 +51,13 @@ const Report = () => {
                     {tw.style('', {
                         justifyContent: "center",
                     })}>
-                    <Button title="Finish" onPress={() => navigation.navigate('HomeScreen')} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 mb-3 rounded-lg`} />
+                    <Button title="Finish" onPress={() => {
+                        navigation.navigate('TaskFinished', {
+                            id: route.params.id,
+                            taskReport: report
+                        })
+
+                    }} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 mb-3 rounded-lg`} />
                 </View>
 
             </View>

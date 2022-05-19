@@ -210,7 +210,9 @@ const TaskView = ({ route }) => {
                                                     zIndex: 3
 
                                                 })}>
-                                                <Button title="Finish the task" type="outline" onPress={() => navigation.navigate('Report')} buttonStyle={tw`ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                                <Button title="Finish the task" type="outline" onPress={() => navigation.navigate('Report', {
+                                                    id: route.params.id
+                                                })} buttonStyle={tw`ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
                                             </View>
                                         ) : (
                                             <View style=
@@ -374,7 +376,7 @@ const TaskView = ({ route }) => {
                                             </View>
                                         </View>
                                     </View>
-                                    {/* Second */}
+                                    {/* Description */}
                                     <View>
                                         <View
                                             style=
@@ -391,9 +393,22 @@ const TaskView = ({ route }) => {
                                             </ScrollView>
                                         </View>
                                     </View>
-                                    {/* Button */}
-                                    <View style={tw`mt-15 mb-10`}>
-                                        <Button title="Start the task" type="solid" buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                    {/* Report */}
+                                    <View>
+                                        <View
+                                            style=
+                                            {tw.style('', {
+                                            })}
+                                        >
+                                            <Text style={tw`text-gray-500 text-lg ml-2 mt-3`}>Report</Text>
+                                            <ScrollView style={
+                                                tw.style('mr-5 ml-5 w-92 h-40', {
+                                                })
+                                            }>
+                                                <Text style={tw`bg-white p-1`}>{item.report}</Text>
+
+                                            </ScrollView>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
@@ -544,7 +559,7 @@ const TaskView = ({ route }) => {
                                             </View>
                                         </View>
                                     </View>
-                                    {/* Second */}
+                                    {/* Description */}
                                     <View>
                                         <View
                                             style=
@@ -561,9 +576,22 @@ const TaskView = ({ route }) => {
                                             </ScrollView>
                                         </View>
                                     </View>
-                                    {/* Button */}
-                                    <View style={tw`mt-15 mb-10`}>
-                                        <Button title="Start the task" type="solid" buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                    {/* Report */}
+                                    <View>
+                                        <View
+                                            style=
+                                            {tw.style('mb-5', {
+                                            })}
+                                        >
+                                            <Text style={tw`text-gray-500 text-lg ml-2 mt-3`}>Report</Text>
+                                            <ScrollView style={
+                                                tw.style('mr-5 ml-5 w-92 h-40', {
+                                                })
+                                            }>
+                                                <Text style={tw`bg-white p-1`}>{item.report}</Text>
+
+                                            </ScrollView>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
