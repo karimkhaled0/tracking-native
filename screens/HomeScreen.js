@@ -13,7 +13,8 @@ const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
-const HomeScreen = () => {
+const HomeScreen = ({ route }) => {
+
     const [progress, setProgress] = useState(true)
     const [review, setReview] = useState(false)
     const [completed, setCompleted] = useState(false)
@@ -22,20 +23,21 @@ const HomeScreen = () => {
     const [tasks, setTasks] = useState([])
 
     const [refreshing, setRefreshing] = useState(false);
-
+    const [pendingTask, setPendingTask] = useState(true)
 
     // on refresh function
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         wait(1000).then(() => setRefreshing(false));
     }, []);
-
+    const [taskStarted, setTaskStarted] = useState([])
     // Fetch userData and tasks
     const getUser = useEffect(() => {
         setTasks([])
+        setPendingTask(true)
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const res = await fetch('http://192.168.1.2:8000/api/user/me', {
+            const res = await fetch('http://192.168.1.7:8000/api/user/me', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,7 +45,7 @@ const HomeScreen = () => {
                 },
             }).then((t) => t.json())
             setUserData(res.data)
-            const ress = await fetch('http://192.168.1.2:8000/api/task', {
+            const ress = await fetch('http://192.168.1.7:8000/api/task', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,14 +54,21 @@ const HomeScreen = () => {
             }).then((t) => t.json())
             ress?.tasks?.map((item) => {
                 if (item.techId._id === res.data._id) {
+                    if (item.inProgress && !item.inReview && !item.finished) {
+                        if (item.started) {
+                            setPendingTask(false)
+                        }
+                    }
                     return setTasks(oldArray => [...oldArray, item])
                 } else {
                     return
                 }
             })
         }
+        // tasks assigned to tasks var and stored in flat list 
         data()
-    }, [refreshing])
+        setTasks([])
+    }, [refreshing, route])
 
     const progressHandler = () => {
         setProgress(true)
@@ -111,19 +120,23 @@ const HomeScreen = () => {
             {/* Progress Task */}
             {
                 progress ? (
-                    <FlatList // loop on data 
-                        data={tasks} // data 
+
+                    <ScrollView
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                             />
                         }
-                        keyExtractor={(item) => item._id}
-                        renderItem={({ item }) => {
-                            if (item.inProgress) {
+                    >
+                        <Text style={tw.style('text-xl mt-5 text-[#4A649F]', {
+                        })}
+                        >Ongoing</Text>
+                        {tasks?.map((item) => {
+                            if (item.inProgress && item.started) {
                                 return (
                                     <TaskSections
+                                        key={item._id}
                                         item={item}
                                         location={item.location}
                                         endDate={item.endDate}
@@ -132,25 +145,40 @@ const HomeScreen = () => {
                                     />
                                 )
                             }
-                        }
-                        }
-                    />
-
+                        })}
+                        <Text style={tw.style('text-xl mt-5 text-gray-500', {
+                        })}
+                        >Pending</Text>
+                        {tasks?.map((item) => {
+                            if (item.inProgress && !item.started) {
+                                return (
+                                    <TaskSections
+                                        key={item._id}
+                                        item={item}
+                                        location={item.location}
+                                        endDate={item.endDate}
+                                        description={item.description}
+                                        id={item._id}
+                                        pending={pendingTask}
+                                    />
+                                )
+                            }
+                        })}
+                    </ScrollView>
                 ) : null
             }
             {/* Review Task */}
             {
                 review ? (
-                    <FlatList // loop on data 
-                        data={tasks} // data 
+                    <ScrollView
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                             />
                         }
-                        keyExtractor={(item) => item._id}
-                        renderItem={({ item }) => {
+                    >
+                        {tasks?.map((item) => {
                             if (item.inReview) {
                                 return (
                                     <TaskSections
@@ -159,27 +187,26 @@ const HomeScreen = () => {
                                         endDate={item.endDate}
                                         description={item.description}
                                         id={item._id}
+                                        key={item._id}
                                     />
                                 )
                             }
-                        }
-                        }
-                    />
+                        })}
+                    </ScrollView>
                 ) : null
             }
             {/* Completed Task */}
             {
                 completed ? (
-                    <FlatList // loop on data 
-                        data={tasks} // data 
+                    <ScrollView
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                             />
                         }
-                        keyExtractor={(item) => item._id}
-                        renderItem={({ item }) => {
+                    >
+                        {tasks?.map((item) => {
                             if (item.finished) {
                                 return (
                                     <TaskSections
@@ -188,12 +215,12 @@ const HomeScreen = () => {
                                         endDate={item.endDate}
                                         description={item.description}
                                         id={item._id}
+                                        key={item._id}
                                     />
                                 )
                             }
-                        }
-                        }
-                    />
+                        })}
+                    </ScrollView>
                 ) : null
             }
             {/* HomeIcons */}

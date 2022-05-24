@@ -10,7 +10,7 @@ const TaskStarted = ({ route }) => {
     const taskStart = useEffect(() => {
         const startTask = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch(`http://192.168.1.2:8000/api/task/${route.params.id}`, {
+            const ress = await fetch(`http://192.168.1.7:8000/api/task/${route.params.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,7 +54,9 @@ const TaskStarted = ({ route }) => {
                 {tw.style('', {
                     justifyContent: "center",
                 })}>
-                <Button title="Back to home" onPress={() => navigation.navigate('HomeScreen')} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
+                <Button title="Back to home" onPress={() => navigation.navigate('HomeScreen', {
+                    refresh: 'paramPropValue'
+                })} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
             </View>
         </View>
     )

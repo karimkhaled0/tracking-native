@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 const Report = ({ id, taskReport, route }) => {
     const navigation = useNavigation()
     const [report, setReport] = useState('')
+    const [reportError, setReportError] = useState('')
 
     return (
         <View
@@ -43,6 +44,7 @@ const Report = ({ id, taskReport, route }) => {
                             textAlignVertical: 'top'
                         })}
                         multiline={true}
+                        placeholder={reportError}
                         onChangeText={(text) => setReport(text)}
                     />
                 </ScrollView>
@@ -52,10 +54,14 @@ const Report = ({ id, taskReport, route }) => {
                         justifyContent: "center",
                     })}>
                     <Button title="Finish" onPress={() => {
-                        navigation.navigate('TaskFinished', {
-                            id: route.params.id,
-                            taskReport: report
-                        })
+                        if (report == '') {
+                            setReportError('You must write something')
+                        } else {
+                            navigation.navigate('TaskFinished', {
+                                id: route.params.id,
+                                taskReport: report
+                            })
+                        }
 
                     }} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 mb-3 rounded-lg`} />
                 </View>

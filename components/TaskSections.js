@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import TaskView from './TaskView';
 
 
-const TaskSections = ({ location, endDate, description, id }) => {
+const TaskSections = ({ location, endDate, description, id, pending }) => {
     const navigation = useNavigation()
     return ( // render items implement
         //   make click opacity animation
@@ -18,7 +18,8 @@ const TaskSections = ({ location, endDate, description, id }) => {
             })}
             onPress={() => {
                 navigation.navigate('TaskView', {
-                    id: id
+                    id: id,
+                    pending: pending
                 })
             }}
         >

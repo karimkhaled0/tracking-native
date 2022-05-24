@@ -1,12 +1,17 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Button } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
+import React, { useEffect } from 'react'
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
+import { Button } from '@rneui/themed';
+import * as SecureStore from 'expo-secure-store';
 
 const NotificationScreen = () => {
     const navigation = useNavigation()
-
+    const signOut = async () => {
+        await SecureStore.deleteItemAsync('userToken');
+        navigation.navigate('loginScreen')
+    }
     return (
         <SafeAreaView
             style={tw.style('bg-white h-full p-5', {
@@ -19,6 +24,7 @@ const NotificationScreen = () => {
                     justifyContent: 'space-between'
                 })}
             >
+                <Button title="Sign in" type="solid" onPress={signOut} buttonStyle={tw`bg-[#4A649F] ml-15 mt-5 mr-15 pt-2 pb-2 rounded-lg`} />
 
             </View>
 

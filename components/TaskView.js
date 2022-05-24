@@ -10,10 +10,9 @@ import { useNavigation } from '@react-navigation/native';
 const TaskView = ({ route }) => {
     const [task, setTask] = useState([])
     const getTask = useEffect(() => {
-        setTask([])
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch('http://192.168.1.2:8000/api/task', {
+            const ress = await fetch('http://192.168.1.7:8000/api/task', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,9 +28,9 @@ const TaskView = ({ route }) => {
             })
         }
         data()
+        setTask([])
     }, [])
-
-
+    console.log(route.params.started)
     const navigation = useNavigation()
     return (
         <ScrollView
@@ -215,16 +214,29 @@ const TaskView = ({ route }) => {
                                                 })} buttonStyle={tw`ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
                                             </View>
                                         ) : (
-                                            <View style=
-                                                {tw.style('mt-15 mb-10', {
-                                                    justifyContent: "center",
-                                                    zIndex: 3
+                                            route.params.pending ? (
+                                                <View style=
+                                                    {tw.style('mt-15 mb-10', {
+                                                        justifyContent: "center",
+                                                        zIndex: 3
 
-                                                })}>
-                                                <Button title="Start the task" type="solid" onPress={() => navigation.navigate('TaskStarted', {
-                                                    id: route.params.id
-                                                })} buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
-                                            </View>
+                                                    })}>
+                                                    <Button title="Start the task" type="solid" onPress={() => navigation.navigate('TaskStarted', {
+                                                        id: route.params.id
+                                                    })} buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                                </View>
+                                            ) : (
+                                                <View style=
+                                                    {tw.style('mt-15 mb-10', {
+                                                        justifyContent: "center",
+                                                        zIndex: 3
+
+                                                    })}>
+                                                    <Button title="Start the task" disabled={true} type="solid" onPress={() => navigation.navigate('TaskStarted', {
+                                                        id: route.params.id
+                                                    })} buttonStyle={tw`bg-[#4A649F] ml-15 mr-15 pt-2 pb-2 rounded-lg`} />
+                                                </View>
+                                            )
                                         )
                                     }
                                 </View>

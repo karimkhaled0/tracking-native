@@ -16,6 +16,7 @@ import TaskStarted from './components/TaskStarted';
 import Report from './components/Report';
 import TaskFinished from './components/TaskFinished';
 const Stack = createNativeStackNavigator()
+const Tab = createBottomTabNavigator();
 
 
 // Home Stacks
@@ -62,32 +63,26 @@ function HomeStack() {
 }
 // App Tabs bottom
 export default function App() {
-  const Tab = createBottomTabNavigator();
   const [logged, setLogged] = useState(false)
 
-  const loginHandler = useEffect(() => {
+  const finish = useEffect(() => {
     const data = async () => {
-      const res = await fetch('http://192.168.1.2:8000/signin', {
-        method: 'POST',
+      let token = await SecureStore.getItemAsync('userToken');
+      const res = await fetch(`http://192.168.1.7:8000/api/user/me`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'authorization': `Bearer ${process.env.LOGTAIL_TOKEN}`
+          'authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          loginId: '201910115',
-          password: '123456789'
-        })
-
       }).then((t) => t.json())
-      await SecureStore.setItemAsync('userToken', res.token);
-      if (res.token) {
-        setLogged(true)
-      } else {
+      if (res.error) {
         setLogged(false)
+      } else {
+        setLogged(true)
       }
     }
     data()
-  }, [])
+  })
 
   return (
     <NavigationContainer>
@@ -146,7 +141,18 @@ export default function App() {
 
                 }}
               />
+              <Tab.Screen
+                name='HomeStack'
+                component={HomeStack}
+                options={{
+                  headerShown: false,
+                  title: '',
+                  tabBarStyle: { display: 'none' },
+
+                }}
+              />
             </Tab.Navigator>
+
           )
         }
       </SafeAreaProvider>

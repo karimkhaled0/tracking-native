@@ -10,7 +10,7 @@ const TaskFinished = ({ route }) => {
     const finish = useEffect(() => {
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch(`http://192.168.1.2:8000/api/task/${route.params.id}`, {
+            const ress = await fetch(`http://192.168.1.7:8000/api/task/${route.params.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -49,7 +49,9 @@ const TaskFinished = ({ route }) => {
                 {tw.style('mb-5 mt-5', {
                     justifyContent: "center",
                 })}>
-                <Button title="Continue" type="outline" onPress={() => navigation.navigate('HomeScreen')} buttonStyle={tw`ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
+                <Button title="Continue" type="outline" onPress={() => navigation.navigate('HomeScreen', {
+                    refresh: 'paramPropValue'
+                })} buttonStyle={tw`ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
             </View>
         </View>
     )
