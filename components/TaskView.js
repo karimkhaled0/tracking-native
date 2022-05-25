@@ -1,4 +1,4 @@
-import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, SafeAreaView, ScrollView, StyleSheet, Text, View, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import tw from 'twrnc';
 import { Icon } from '@rneui/base';
@@ -6,8 +6,17 @@ import { Button } from '@rneui/themed';
 import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
+import MapView, { Marker } from 'react-native-maps';
 
 const TaskView = ({ route }) => {
+    const [viewport, setViewport] = useState({
+        latitude: 26.8206,
+        longitude: 30.8025,
+        latitudeDelta: 8,
+        longitudeDelta: 0.9421,
+    })
+    const [coordinate, setCoordinate] = useState({})
+
     const [task, setTask] = useState([])
     const getTask = useEffect(() => {
         const data = async () => {
@@ -21,6 +30,7 @@ const TaskView = ({ route }) => {
             }).then((t) => t.json())
             ress?.tasks?.map((item) => {
                 if (item._id === route.params.id) {
+                    setCoordinate(item.coordinates)
                     return setTask(oldArray => [...oldArray, item])
                 } else {
                     return
@@ -30,7 +40,6 @@ const TaskView = ({ route }) => {
         data()
         setTask([])
     }, [])
-    console.log(route.params.started)
     const navigation = useNavigation()
     return (
         <ScrollView
@@ -177,9 +186,30 @@ const TaskView = ({ route }) => {
                                                 {tw.style('mt-8', {
                                                 })}
                                             >
-                                                <Text style={tw`text-gray-500 text-lg`}>Location</Text>
-                                                <Text style={tw`font-bold ml-2 w-60 text-lg mt-2`}>{item.location}</Text>
-                                                <View style={tw`border-b pl-10 pr-52 border-gray-300`}></View>
+                                                <View style={styles.container}>
+                                                    <MapView style=
+                                                        {tw.style('w-66 h-66', {
+                                                        })}
+                                                        region={viewport}
+                                                        onPress={() => navigation.navigate('TaskMap', {
+                                                            coordinates: {
+                                                                long: coordinate.long,
+                                                                lat: coordinate.lat
+                                                            },
+                                                            viewport: viewport
+                                                        })}
+                                                    >
+                                                        <Marker
+                                                            coordinate={{ latitude: coordinate.lat, longitude: coordinate.long }}
+                                                        >
+                                                            <Icon
+                                                                type='font-awesome-5'
+                                                                name='map-marker-alt'
+                                                                color='#FF0000'
+                                                            />
+                                                        </Marker>
+                                                    </MapView>
+                                                </View>
                                             </View>
                                         </View>
                                     </View>
@@ -617,5 +647,12 @@ const TaskView = ({ route }) => {
 }
 
 export default TaskView
+const styles = StyleSheet.create({
+    container: {
 
-const styles = StyleSheet.create({})
+    },
+    map: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+    },
+});

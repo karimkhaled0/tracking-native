@@ -15,6 +15,7 @@ import TaskView from './components/TaskView';
 import TaskStarted from './components/TaskStarted';
 import Report from './components/Report';
 import TaskFinished from './components/TaskFinished';
+import TaskMap from './components/TaskMap';
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 
@@ -58,6 +59,13 @@ function HomeStack() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="TaskMap"
+        component={TaskMap}
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   )
 }
@@ -82,7 +90,7 @@ export default function App() {
       }
     }
     data()
-  })
+  }, [Tab, Stack])
 
   return (
     <NavigationContainer>
