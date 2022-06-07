@@ -5,10 +5,10 @@ import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '@rneui/themed';
 import { TextInput } from 'react-native-gesture-handler';
+import * as Updates from 'expo-updates';
 
-const Login = () => {
+const Login = ({ log }) => {
     const navigation = useNavigation()
-
     const [loginId, setloginId] = useState('');
     const [password, setPassword] = useState('');
 
@@ -18,7 +18,7 @@ const Login = () => {
     const submitForm = async () => {
         setloginIdErr('')
         setPasswordErr('')
-        const res = await fetch('http://192.168.1.7:8000/signin', {
+        const res = await fetch('http://192.168.43.101:8000/signin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,9 +36,12 @@ const Login = () => {
 
         const error = res.errors
         if (!error) {
-            navigation.navigate('HomeStack')
+            let token = await SecureStore.getItemAsync('userToken');
+            log = true
+            console.log(token)
             return
         } else {
+            log = false
             console.log(error)
             if (error.loginId) {
                 setloginIdErr(error.loginId)

@@ -5,12 +5,14 @@ import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
 import { Button } from '@rneui/themed';
 import * as SecureStore from 'expo-secure-store';
+import * as Updates from 'expo-updates';
 
 const NotificationScreen = () => {
     const navigation = useNavigation()
     const signOut = async () => {
         await SecureStore.deleteItemAsync('userToken');
-        navigation.navigate('loginScreen')
+        Updates.reloadAsync()
+        console.log('done')
     }
     return (
         <SafeAreaView
