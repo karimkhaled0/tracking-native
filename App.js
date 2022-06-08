@@ -8,6 +8,7 @@ import Login from './screens/Login';
 import { useEffect, useState } from 'react';
 import tw from 'twrnc';
 import ChatScreen from './screens/ChatScreen';
+import ChangePasswordScreen from './screens/ChangePasswordScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import NotificationScreen from './screens/NotificationScreen';
 import * as SecureStore from 'expo-secure-store';
@@ -74,6 +75,7 @@ function HomeStack() {
 export default function App() {
   // Loggin functions
   const [loginId, setloginId] = useState('');
+  const [changePassword, setChangePassword] = useState('');
   const [password, setPassword] = useState('');
   const [clicked, setClicked] = useState(false); // for checking if user or not and redirect to home screen
   // handle errors
@@ -126,6 +128,13 @@ export default function App() {
           'authorization': `Bearer ${token}`
         },
       }).then((t) => t.json())
+      if (res.data.changePasswordCounter == 0) {
+        setChangePassword(true)
+      }
+      if (res.data.changePasswordCounter == 1) {
+        setChangePassword(false)
+
+      }
       if (res.error) {
         setLogged(false)
       } else {
@@ -134,12 +143,27 @@ export default function App() {
     }
     data()
   }, [clicked])
+  console.log(changePassword)
   return (
     <NavigationContainer>
       <SafeAreaProvider>
         {
           logged ? (
             <Tab.Navigator>
+              {
+                changePassword ? (
+                  <Tab.Screen
+                    name='ChangePassword'
+                    component={ChangePasswordScreen}
+                    options={{
+                      headerShown: false,
+                      title: '',
+                      tabBarStyle: { display: 'none' },
+
+                    }}
+                  />
+                ) : null
+              }
               <Tab.Screen
                 name='HomeStack'
                 component={HomeStack}
@@ -150,6 +174,7 @@ export default function App() {
 
                 }}
               />
+
               <Tab.Screen
                 name='ChatScreen'
                 component={ChatScreen}
