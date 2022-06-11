@@ -8,7 +8,7 @@ const ChatScreen = () => {
     const navigation = useNavigation()
     return (
         <SafeAreaView
-            style={tw.style('bg-white h-full p-5', {
+            style={tw.style('bg-white h-full', {
             })}
         >
             <Text style={tw`text-center text-xl mt-10 mb-5`}>Chat</Text>
@@ -22,14 +22,14 @@ const ChatScreen = () => {
             </View>
             {/* HomeIcons */}
             <View
-                style={tw.style('flex-row ', {
+                style={tw.style('flex-row p-3', {
                     justifyContent: 'space-between',
                     alignItems: 'flex-end'
                 })}
             >
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-white w-20', {
                             elevation: 3,
                         })
                     }
@@ -41,7 +41,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-white w-20', {
                             elevation: 3,
                         })
                     }
@@ -51,7 +51,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-white w-20', {
                             elevation: 3,
                         })
                     }
@@ -63,7 +63,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-white w-20', {
                             elevation: 3,
                         })
                     }

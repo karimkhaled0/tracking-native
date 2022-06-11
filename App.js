@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Image, RefreshControl } from 'react-native'
 import HomeScreen from './screens/HomeScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import 'react-native-gesture-handler'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ChatScreen from './screens/ChatScreen';
-import ProfileScreen from './screens/ProfileScreen';
 import NotificationScreen from './screens/NotificationScreen';
 import * as SecureStore from 'expo-secure-store';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,13 +14,17 @@ import Report from './components/Report';
 import TaskFinished from './components/TaskFinished';
 import TaskMap from './components/TaskMap';
 import tw from 'twrnc';
-import React, { useState, useEffect, createContext, useContext, useReducer, useMemo } from 'react'
-import { Button } from '@rneui/themed';
-import { TextInput } from 'react-native-gesture-handler';
+import React, { useState, useEffect, createContext, useContext, useReducer, useMemo, useCallback } from 'react'
+import { Icon } from '@rneui/base';
+import { Button, Avatar } from '@rneui/themed';
+import { ScrollView, TextInput } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const AuthContext = createContext();
-
+const wait = timeout => {
+  return new Promise(resolve => setTimeout(resolve, timeout));
+};
 // Home Stacks
 function HomeStack() {
   return (
@@ -342,6 +345,330 @@ function ChangePasswordScreen() {
   );
 }
 
+// Profile Screen
+function ProfileScreen() {
+  const navigation = useNavigation()
+  // Refresh Control
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => {
+      setRefreshing(false)
+    });
+  }, []);
+  const [userData, setUserData] = useState([])
+  // Get user DATA
+  const getUserData = useEffect(() => {
+    const data = async () => {
+      let token = await SecureStore.getItemAsync('userToken');
+      const res = await fetch('http://192.168.43.101:8000/api/user/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authorization': `Bearer ${token}`
+        },
+      }).then((t) => t.json())
+      setUserData([res.data])
+    }
+    data()
+  }, [refreshing])
+
+  // Update User Data
+  const [edit, setEdit] = useState(false)
+  const [editedPhone, setEditedPhone] = useState(userData[0]?.phonenumber)
+  const [editAddress, setEditAddress] = useState(userData[0]?.address)
+  const [editName, setEditName] = useState(userData[0]?.name)
+
+  console.log(userData)
+  const updateUser = async () => {
+    let token = await SecureStore.getItemAsync('userToken');
+    const res = await fetch(`http://192.168.43.101:8000/api/user/${userData[0]._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        phonenumber: editedPhone,
+        address: editAddress,
+        name: editName
+      })
+    }).then((t) => t.json()).catch((e) => console.log(e))
+    setEdit(!edit)
+
+  }
+
+  const { signOut } = useContext(AuthContext);
+
+  return (
+    <SafeAreaView
+      style={tw.style('bg-[#F8F8F8] h-full', {
+      })}
+    >
+      <Text style={tw`text-center text-xl mt-10 mb-5 font-semibold`}>My profile</Text>
+
+      <View
+        style={tw.style('h-5/6 ', {
+        })}
+      >
+        <ScrollView
+          style={tw.style('p-3', {
+          })}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+        >
+          {/* Profile section */}
+          {
+            userData?.map((item) => (
+              <View
+                style={tw.style('h-5/6 ', {
+                })}
+                key={item._id}
+              >
+                {/* Name and Photo */}
+                <View
+                  style={tw.style('h-36 bg-[#4A649F] rounded-lg flex items-center justify-center mb-10', {
+
+                  })}
+                >
+                  <Avatar
+                    size={64}
+                    rounded
+                    title={item.name[0]}
+                    titleStyle={{ color: '#BDBDBD' }}
+                    containerStyle={{ backgroundColor: 'white' }}
+                  />
+                  {
+                    edit ? (
+                      <TextInput
+                        placeholder='Change Your name'
+                        value={editName}
+                        style={tw.style('bg-white rounded-lg w-52 mt-3 p-1 text-xl', {
+                        })}
+                        onChangeText={(text) => setEditName(text)}
+                      />
+                    ) : (
+                      <Text style={tw`text-2xl text-white font-semibold mt-3`}>{item.name}</Text>
+                    )
+                  }
+
+                </View>
+                {/* Login Id */}
+                <View
+                  style={tw.style('h-18 bg-white rounded-lg shadow-md flex-row items-center', {
+                    justifyContent: "space-between"
+                  })}
+                >
+                  <Icon
+                    style={
+                      tw.style('p-2 bg-white w-11', {
+                        elevation: 3,
+                      })
+                    }
+                    type='font-awesome-5'
+                    name='id-card'
+                    color='#4A649F'
+
+                  />
+                  <Text style={tw`text-xl text-black`}>{item.loginId}</Text>
+                  <Icon
+                    style={
+                      tw.style('p-2 bg-white w-11', {
+                        elevation: 3,
+                      })
+                    }
+                  />
+                </View>
+                {/* Phone number */}
+                <View
+                  style={tw.style('h-18 bg-white rounded-lg shadow-md flex-row items-center mt-5', {
+                    justifyContent: "space-between"
+                  })}
+                >
+                  <Icon
+                    style={
+                      tw.style('p-2 bg-white w-11', {
+                        elevation: 3,
+                      })
+                    }
+                    type='font-awesome-5'
+                    name='phone-alt'
+                    color='#4A649F'
+                  />
+                  {
+                    edit ? (
+                      <TextInput
+                        placeholder='Change Your phone'
+                        value={editedPhone}
+                        style={tw.style('bg-white rounded-lg h-18 text-xl', {
+                        })}
+                        onChangeText={(text) => setEditedPhone(text)}
+                      />
+                    ) : (
+                      <Text style={tw`text-xl text-black`}>{item.phonenumber}</Text>
+                    )
+                  }
+                  <Icon
+                    style={
+                      tw.style('p-2 bg-white w-11', {
+                        elevation: 3,
+                      })
+                    }
+                  />
+                </View>
+                {/* Address */}
+                <View
+                  style={tw.style('h-18 bg-white rounded-lg shadow-md flex-row items-center mt-5', {
+                    justifyContent: "space-between"
+                  })}
+                >
+                  <View>
+                    <Icon
+                      style={
+                        tw.style('p-2 bg-white w-11', {
+                          elevation: 3,
+                        })
+                      }
+                      type='font-awesome-5'
+                      name='map-marker-alt'
+                      color='#4A649F'
+
+                    />
+                  </View>
+                  {
+                    edit ? (
+                      <TextInput
+                        placeholder='Change Your address'
+                        value={editAddress}
+                        style={tw.style('bg-white rounded-lg h-18 text-xl', {
+                        })}
+                        onChangeText={(text) => setEditAddress(text)}
+                      />
+                    ) : (
+                      <Text style={tw`text-xl text-black`}>{item.address}</Text>
+                    )
+                  }
+                  <Icon
+                    style={
+                      tw.style('p-2 bg-white w-11', {
+                        elevation: 3,
+                      })
+                    }
+                  />
+                </View>
+                {/* Password */}
+                <View
+                  style={tw.style('h-18 bg-white rounded-lg shadow-md flex-row items-center mt-5', {
+                    justifyContent: "space-between"
+                  })}
+                >
+                  <View>
+                    <Icon
+                      style={
+                        tw.style('p-2 bg-white w-11', {
+                          elevation: 3,
+                        })
+                      }
+                      type='font-awesome-5'
+                      name='lock'
+                      color='#4A649F'
+                    />
+                  </View>
+                  <Text style={tw`text-xl text-black ml-2`}>**********</Text>
+                  <Button title="Change" type="solid" buttonStyle={tw`bg-[#4A649F] pt-2 pb-2 rounded-lg mr-2`} />
+                </View>
+
+                {
+                  edit ? (
+                    <View
+                      style={tw.style('flex-row', {
+                        justifyContent: "space-evenly"
+                      })}
+                    >
+                      <Button title="Update" onPress={updateUser} type="solid" titleStyle={{ color: 'white' }} buttonStyle={tw`bg-[#4A649F] w-40 pt-2 pb-2 rounded-lg mr-2 mt-10`} />
+                      <Button title="Cancel" onPress={() => setEdit(!edit)} titleStyle={{ color: 'red' }} type="outline" buttonStyle={tw`w-40 pt-2 pb-2 rounded-lg mr-2 mt-10`} />
+                    </View>
+
+                  ) : (
+                    <View
+                      style={tw.style('flex-row', {
+                        justifyContent: "space-evenly"
+                      })}
+                    >
+                      <Button title="Edit" onPress={() => setEdit(!edit)} titleStyle={{ color: 'white' }} type="solid" buttonStyle={tw`bg-[#4A649F] w-40 pt-2 pb-2 rounded-lg mr-2 mt-10`} />
+                      <Button title="Log out" onPress={signOut} titleStyle={{ color: 'red' }} type="outline" buttonStyle={tw`w-40 pt-2 pb-2 rounded-lg mr-2 mt-10`} />
+                    </View>
+                  )
+                }
+
+              </View>
+            ))
+          }
+
+        </ScrollView>
+      </View>
+      {/* HomeIcons */}
+      <View
+        style={tw.style('flex-row p-3', {
+          justifyContent: 'space-between',
+          alignItems: 'flex-end'
+        })}
+      >
+        <Icon
+          style={
+            tw.style('p-2 bg-[#F8F8F8] w-20', {
+              elevation: 3,
+            })
+          }
+          type='font-awesome-5'
+          name='tasks'
+          color='black'
+          onPress={() => navigation.navigate('HomeStack')}
+
+        />
+        <Icon
+          style={
+            tw.style('p-2 bg-[#F8F8F8] w-20', {
+              elevation: 3,
+            })
+          }
+          type='font-awesome-5'
+          name='headset'
+          color='black'
+          onPress={() => navigation.navigate('ChatScreen')}
+
+        />
+        <Icon
+          style={
+            tw.style('p-2 bg-[#F8F8F8] w-20', {
+              elevation: 3,
+            })
+          }
+          type='font-awesome-5'
+          name='bell'
+          color='black'
+          onPress={() => navigation.navigate('NotificationScreen')}
+
+        />
+        <Icon
+          style={
+            tw.style('p-2 bg-[#F8F8F8] w-20', {
+              elevation: 3,
+            })
+          }
+          type='font-awesome-5'
+          name='user'
+          color='#4A649F'
+        />
+      </View>
+    </SafeAreaView >
+  )
+}
+
 // App Tabs bottom
 export default function App() {
   // Use Reducer for tracking the user login or change his password for first time and also for sign out
@@ -372,9 +699,16 @@ export default function App() {
             shouldChange: false,
             isSignout: false,
           };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignout: true,
+            userToken: null,
+          };
       }
     },
     {
+      isSignout: false,
       isLoading: true,
       userToken: null,
       shouldChange: false
@@ -404,7 +738,7 @@ export default function App() {
     bootstrapAsync();
   }, []);
 
-  // dispatch all the reducers 
+  // dispatch all the reducers (Dispatch means to call it )
   const authContext = useMemo(
     () => ({
       signIn: async (data) => {
@@ -414,6 +748,7 @@ export default function App() {
       },
       changePass: () => dispatch({ type: 'CHANGE_PASS' }),
       passChanged: () => dispatch({ type: 'PASS_CHANGED' }),
+      signOut: () => dispatch({ type: 'SIGN_OUT' }),
 
     }),
     []

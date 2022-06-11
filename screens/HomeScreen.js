@@ -88,13 +88,13 @@ const HomeScreen = ({ route }) => {
     const navigation = useNavigation()
     return (
         <SafeAreaView
-            style={tw.style('bg-white h-full p-5 pt-10 mt-2', {
+            style={tw.style('bg-[#F8F8F8] h-full pt-10 mt-2', {
                 justifyContent: "flex-start"
             })}
         >
             {/* Tasks Sections */}
             <View
-                style={tw.style('flex-row', {
+                style={tw.style('flex-row pl-5 pr-5', {
                     justifyContent: 'space-between'
                 })}
             >
@@ -122,6 +122,7 @@ const HomeScreen = ({ route }) => {
                 progress ? (
 
                     <ScrollView
+                        style={tw`pl-5 pr-5`}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -171,6 +172,7 @@ const HomeScreen = ({ route }) => {
             {
                 review ? (
                     <ScrollView
+                        style={tw`pl-5 pr-5`}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -199,6 +201,7 @@ const HomeScreen = ({ route }) => {
             {
                 completed ? (
                     <ScrollView
+                        style={tw`pl-5 pr-5`}
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
@@ -225,14 +228,14 @@ const HomeScreen = ({ route }) => {
             }
             {/* HomeIcons */}
             <View
-                style={tw.style('flex-row', {
+                style={tw.style('flex-row p-3', {
                     justifyContent: 'space-between',
 
                 })}
             >
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4 ', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20 ', {
                             elevation: 3,
                         })
                     }
@@ -242,7 +245,7 @@ const HomeScreen = ({ route }) => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4 ', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20 ', {
                             elevation: 3,
                         })
                     }
@@ -253,7 +256,7 @@ const HomeScreen = ({ route }) => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
@@ -265,7 +268,7 @@ const HomeScreen = ({ route }) => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20 mt-4', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
