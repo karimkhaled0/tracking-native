@@ -10,7 +10,7 @@ const TaskStarted = ({ route }) => {
     const taskStart = useEffect(() => {
         const startTask = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch(`http://192.168.43.101:8000/api/task/${route.params.id}`, {
+            const ress = await fetch(`http://192.168.1.9:8000/api/task/${route.params.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ const TaskSections = ({ location, endDate, description, id, pending }) => {
             >
                 <Icon
                     style={
-                        tw.style('p-2  bg-white', {
+                        tw.style('p-2 bg-[#F8F8F8]', {
                         })
                     }
                     type='feather'
@@ -51,7 +51,7 @@ const TaskSections = ({ location, endDate, description, id, pending }) => {
             >
                 <Icon
                     style={
-                        tw.style('p-2  bg-white', {
+                        tw.style('p-2 bg-[#F8F8F8]', {
                         })
                     }
                     type='feather'
@@ -71,7 +71,7 @@ const TaskSections = ({ location, endDate, description, id, pending }) => {
             >
                 <Icon
                     style={
-                        tw.style('p-2 bg-white', {
+                        tw.style('p-2 bg-[#F8F8F8]', {
                         })
                     }
                     type='feather'

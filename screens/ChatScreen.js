@@ -1,25 +1,201 @@
-import { StyleSheet, Text, View, SafeAreaView, Image, Button } from 'react-native'
-import React from 'react'
+import { Text, View, SafeAreaView, TouchableOpacity, ScrollView, FlatList } from 'react-native'
+import React, { useRef } from 'react'
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
+import { TextInput } from 'react-native-gesture-handler';
+import { Avatar } from '@rneui/themed';
+import { useState } from 'react';
+import ChatOutside from '../components/ChatOutside';
+import { faker } from '@faker-js/faker';
+import { format, parseISO } from 'date-fns'
 
 const ChatScreen = () => {
     const navigation = useNavigation()
+    const [menu, setMenu] = useState(false)
+    const data = [
+        {
+            name: 'Karim Khaled',
+            date: '17/06/2022',
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: 'Ahmed yasser',
+            date: '16/06/2022',
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+        {
+            name: faker.name.firstName(),
+            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
+            message: faker.lorem.paragraph(),
+        },
+    ]
     return (
         <SafeAreaView
-            style={tw.style('bg-white h-full', {
+            style={tw.style('bg-[#F8F8F8] h-full pt-10 mt-2', {
             })}
         >
-            <Text style={tw`text-center text-xl mt-10 mb-5`}>Chat</Text>
             {/* Chat */}
+            {
+                menu ?
+                    (
+                        <View
+                            style={tw.style('flex-row items-center border-b border-gray-200 pb-4', {
+                                justifyContent: 'space-between',
+                            })}
+                        >
+                            <View
+                                style={tw.style('flex-row items-center', {
+                                    justifyContent: 'space-between',
+                                })}
+                            >
+                                <Icon
+                                    style={
+                                        tw.style('ml-5 mr-10 bg-[#F8F8F8]', {
+                                        })
+                                    }
+                                    type='font-awesome-5'
+                                    name='times'
+                                    size={25}
+                                    color='gray'
+                                    onPress={() => setMenu(!menu)}
+                                />
+                                <Text style={tw`text-2xl `}>1</Text>
+                            </View>
+
+                            <View
+                                style={tw.style('flex-row items-center', {
+                                    justifyContent: 'space-between',
+                                })}
+                            >
+                                <Icon
+                                    style={
+                                        tw.style('ml-5 bg-[#F8F8F8]', {
+                                        })
+                                    }
+                                    type='font-awesome-5'
+                                    name='trash'
+                                    size={20}
+                                    color='gray'
+                                    onPress={() => {
+                                        console.log('h')
+                                    }}
+                                />
+                                <Icon
+                                    style={
+                                        tw.style('ml-5 mr-5 bg-[#F8F8F8]', {
+                                        })
+                                    }
+                                    type='font-awesome-5'
+                                    name='user'
+                                    size={20}
+                                    color='gray'
+                                />
+                            </View>
+                        </View>
+                    ) : (
+                        <View
+                            style={tw.style('flex-row items-center pb-4', {
+                                justifyContent: 'space-between',
+                            })}
+                        >
+                            <Text style={tw`text-4xl ml-5 font-semibold`}>Messages</Text>
+                            {/*  new Message */}
+                            <TouchableOpacity>
+                                <Text style={tw`text-2xl mr-5  text-blue-500 font-semibold`}>New Message</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )
+            }
+
+
+            {/* Search */}
             <View
-                style={tw.style('flex-row h-5/6 ', {
-                    justifyContent: 'space-between'
+                style={tw.style('', {
                 })}
             >
-
+                <View
+                    style={
+                        tw.style('flex-row bg-white rounded-full mt-5 ml-5 mr-5 items-center', {
+                            justifyContent: "flex-start"
+                        })
+                    }
+                >
+                    <Icon
+                        style={
+                            tw.style('pl-5', {
+                            })
+                        }
+                        type='feather'
+                        name='search'
+                        color='gray'
+                    />
+                    <TextInput
+                        returnKeyType='search'
+                        style={tw.style('w-full pt-3 pb-2 pl-3 text-lg ', {
+                            textAlignVertical: 'top'
+                        })}
+                        placeholder={'Search'}
+                    />
+                </View>
             </View>
+
+
+            {/* User chat */}
+            <FlatList
+                data={data}
+                renderItem={({ item }) => {
+                    return (
+                        <TouchableOpacity
+                            onLongPress={() => {
+                                setMenu(!menu)
+                            }}
+                            delayLongPress={600}
+                            key={item.name}
+                            onPress={() => {
+                                navigation.navigate('ChatInside', {
+                                    name: item.name,
+                                    data: item.date,
+                                    message: item.message
+                                })
+                            }}
+                        >
+                            <ChatOutside
+                                name={item.name}
+                                date={item.date}
+                                message={item.message}
+                            />
+                        </TouchableOpacity>
+                    )
+                }}
+            />
+
+
             {/* HomeIcons */}
             <View
                 style={tw.style('flex-row p-3', {
@@ -29,7 +205,7 @@ const ChatScreen = () => {
             >
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
@@ -41,7 +217,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
@@ -51,7 +227,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
@@ -63,7 +239,7 @@ const ChatScreen = () => {
                 />
                 <Icon
                     style={
-                        tw.style('p-2 bg-white w-20', {
+                        tw.style('p-2 bg-[#F8F8F8] w-20', {
                             elevation: 3,
                         })
                     }
@@ -74,10 +250,10 @@ const ChatScreen = () => {
 
                 />
             </View>
-        </SafeAreaView>
+
+
+        </SafeAreaView >
     )
 }
 
 export default ChatScreen
-
-const styles = StyleSheet.create({})

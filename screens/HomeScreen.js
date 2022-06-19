@@ -37,7 +37,7 @@ const HomeScreen = ({ route }) => {
         setPendingTask(true)
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const res = await fetch('http://192.168.43.101:8000/api/user/me', {
+            const res = await fetch('http://192.168.1.9:8000/api/user/me', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const HomeScreen = ({ route }) => {
                 },
             }).then((t) => t.json())
             setUserData(res.data)
-            const ress = await fetch('http://192.168.43.101:8000/api/task', {
+            const ress = await fetch('http://192.168.1.9:8000/api/task', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ const HomeScreen = ({ route }) => {
                     type='font-awesome-5'
                     name='headset'
                     color='black'
-                    onPress={() => navigation.navigate('ChatScreen')}
+                    onPress={() => navigation.navigate('ChatStack')}
                 />
                 <Icon
                     style={

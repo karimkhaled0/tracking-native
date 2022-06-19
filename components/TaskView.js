@@ -10,9 +10,9 @@ import MapView, { Marker } from 'react-native-maps';
 
 const TaskView = ({ route }) => {
     const [viewport, setViewport] = useState({
-        latitude: 26.8206,
-        longitude: 30.8025,
-        latitudeDelta: 8,
+        latitude: 30.06125232571432,
+        longitude: 31.242046455822305,
+        latitudeDelta: 2,
         longitudeDelta: 0.9421,
     })
     const [coordinate, setCoordinate] = useState({})
@@ -21,7 +21,7 @@ const TaskView = ({ route }) => {
     const getTask = useEffect(() => {
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch('http://192.168.43.101:8000/api/task', {
+            const ress = await fetch('http://192.168.1.9:8000/api/task', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -183,11 +183,14 @@ const TaskView = ({ route }) => {
                                             {/* Location */}
                                             <View
                                                 style=
-                                                {tw.style('mt-8', {
+                                                {tw.style('mt-3', {
                                                 })}
                                             >
                                                 <View style={styles.container}>
-                                                    <MapView style=
+                                                    <Text style={tw`text-xl text-center text-gray-500`}>Click To view the map</Text>
+                                                    <MapView
+                                                        userInterfaceStyle='dark'
+                                                        style=
                                                         {tw.style('w-66 h-66', {
                                                         })}
                                                         region={viewport}

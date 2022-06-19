@@ -19,13 +19,15 @@ import { Icon } from '@rneui/base';
 import { Button, Avatar } from '@rneui/themed';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import ChatInside from './components/ChatInside';
+import * as Location from 'expo-location';
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const AuthContext = createContext();
 const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 };
-// Home Stacks
+// Home Screens
 function HomeStack() {
   return (
     <Stack.Navigator screenOptions={{ animationEnabled: false }}>
@@ -75,6 +77,27 @@ function HomeStack() {
   )
 }
 
+// Chat Screens
+function ChatStack() {
+  return (
+    <Stack.Navigator screenOptions={{ animationEnabled: false }}>
+      <Stack.Screen
+        name="ChatScreen"
+        component={ChatScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="ChatInside"
+        component={ChatInside}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  )
+}
 // Login Screen
 function LoginScreen() {
   const [loginId, setloginId] = useState('');
@@ -90,7 +113,7 @@ function LoginScreen() {
   const submitForm = async () => {
     setloginIdErr('')
     setPasswordErr('')
-    const res = await fetch('http://192.168.43.101:8000/signin', {
+    const res = await fetch('http://192.168.1.9:8000/signin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -111,7 +134,7 @@ function LoginScreen() {
       // here i got the token and check if user change his password
       // before or not
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch(`http://192.168.43.101:8000/api/user/me`, {
+      const res = await fetch(`http://192.168.1.9:8000/api/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -235,7 +258,7 @@ function ChangePasswordScreen() {
   const loginHandler = useEffect(() => {
     const data = async () => {
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch(`http://192.168.43.101:8000/api/user/me`, {
+      const res = await fetch(`http://192.168.1.9:8000/api/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -255,7 +278,7 @@ function ChangePasswordScreen() {
     if (shouldChange) {
       if (password1 == password2) {
         if ((password1.length > 8 && password1.length < 16) && (password2.length > 8 && password2.length < 16)) {
-          const res = await fetch(`http://192.168.43.101:8000/api/user/changepassword`, {
+          const res = await fetch(`http://192.168.1.9:8000/api/user/changepassword`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -361,7 +384,7 @@ function ProfileScreen() {
   const getUserData = useEffect(() => {
     const data = async () => {
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch('http://192.168.43.101:8000/api/user/me', {
+      const res = await fetch('http://192.168.1.9:8000/api/user/me', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -382,7 +405,7 @@ function ProfileScreen() {
   console.log(userData)
   const updateUser = async () => {
     let token = await SecureStore.getItemAsync('userToken');
-    const res = await fetch(`http://192.168.43.101:8000/api/user/${userData[0]._id}`, {
+    const res = await fetch(`http://192.168.1.9:8000/api/user/${userData[0]._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -402,15 +425,14 @@ function ProfileScreen() {
 
   return (
     <SafeAreaView
-      style={tw.style('bg-[#F8F8F8] h-full', {
+      style={tw.style('bg-[#F8F8F8] h-full pt-10 mt-2', {
       })}
     >
-      <Text style={tw`text-center text-xl mt-10 mb-5 font-semibold`}>My profile</Text>
-
       <View
-        style={tw.style('h-5/6 ', {
+        style={tw.style('', {
         })}
       >
+        <Text style={tw`text-4xl ml-5 font-semibold mb-5 text-[#4A649F]`}>My profile</Text>
         <ScrollView
           style={tw.style('p-3', {
           })}
@@ -425,7 +447,7 @@ function ProfileScreen() {
           {
             userData?.map((item) => (
               <View
-                style={tw.style('h-5/6 ', {
+                style={tw.style('', {
                 })}
                 key={item._id}
               >
@@ -471,6 +493,7 @@ function ProfileScreen() {
                     }
                     type='font-awesome-5'
                     name='id-card'
+                    size={20}
                     color='#4A649F'
 
                   />
@@ -498,6 +521,7 @@ function ProfileScreen() {
                     type='font-awesome-5'
                     name='phone-alt'
                     color='#4A649F'
+                    size={20}
                   />
                   {
                     edit ? (
@@ -536,6 +560,7 @@ function ProfileScreen() {
                       type='font-awesome-5'
                       name='map-marker-alt'
                       color='#4A649F'
+                      size={20}
 
                     />
                   </View>
@@ -575,6 +600,7 @@ function ProfileScreen() {
                       }
                       type='font-awesome-5'
                       name='lock'
+                      size={20}
                       color='#4A649F'
                     />
                   </View>
@@ -585,7 +611,7 @@ function ProfileScreen() {
                 {
                   edit ? (
                     <View
-                      style={tw.style('flex-row', {
+                      style={tw.style('flex-row mt-10', {
                         justifyContent: "space-evenly"
                       })}
                     >
@@ -595,7 +621,7 @@ function ProfileScreen() {
 
                   ) : (
                     <View
-                      style={tw.style('flex-row', {
+                      style={tw.style('flex-row mt-10', {
                         justifyContent: "space-evenly"
                       })}
                     >
@@ -611,6 +637,8 @@ function ProfileScreen() {
 
         </ScrollView>
       </View>
+      <ScrollView></ScrollView>
+
       {/* HomeIcons */}
       <View
         style={tw.style('flex-row p-3', {
@@ -639,7 +667,7 @@ function ProfileScreen() {
           type='font-awesome-5'
           name='headset'
           color='black'
-          onPress={() => navigation.navigate('ChatScreen')}
+          onPress={() => navigation.navigate('ChatStack')}
 
         />
         <Icon
@@ -724,8 +752,19 @@ export default function App() {
         // Restore token stored in `SecureStore` or any other encrypted storage
         // userToken = await SecureStore.getItemAsync('userToken');
         userToken = await SecureStore.getItemAsync('userToken');
+        const res = await fetch('http://192.168.1.9:8000/api/user/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${userToken}`
+          },
+        }).then((t) => t.json())
+        if (res.error == 'Not Authorized') {
+          throw 'SignOut'
+        }
       } catch (e) {
         // Restoring token failed
+        return dispatch({ type: 'SIGN_OUT' })
       }
 
       // After restoring token, we may need to validate it in production apps
@@ -753,6 +792,23 @@ export default function App() {
     }),
     []
   );
+
+  // Get location of user
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('hi')
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+    })();
+  }, []);
+
   return (
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
@@ -795,8 +851,8 @@ export default function App() {
                   />
 
                   <Tab.Screen
-                    name='ChatScreen'
-                    component={ChatScreen}
+                    name='ChatStack'
+                    component={ChatStack}
                     options={{
                       headerShown: false,
                       title: '',

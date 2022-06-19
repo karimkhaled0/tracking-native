@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, SafeAreaView, Image } from 'react-native'
+import { StyleSheet, Text, View, SafeAreaView, Image, ScrollView } from 'react-native'
 import React, { useEffect } from 'react'
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
@@ -16,19 +16,20 @@ const NotificationScreen = () => {
     }
     return (
         <SafeAreaView
-            style={tw.style('bg-white h-full', {
+            style={tw.style('bg-white h-full pt-10 mt-2', {
             })}
         >
-            <Text style={tw`text-center text-xl mt-10 mb-5`}>Notifications</Text>
             {/* Notification Section */}
             <View
-                style={tw.style('flex-row h-5/6 ', {
-                    justifyContent: 'space-between'
+                style={tw.style('flex-row items-center', {
+                    justifyContent: 'space-between',
                 })}
             >
-                <Button title="Sign in" type="solid" onPress={signOut} buttonStyle={tw`bg-[#4A649F] ml-15 mt-5 mr-15 pt-2 pb-2 rounded-lg`} />
-
+                <Text style={tw`text-4xl ml-5 font-semibold`}>Notification</Text>
             </View>
+            <ScrollView>
+
+            </ScrollView>
 
             {/* HomeIcons */}
             <View
@@ -58,7 +59,7 @@ const NotificationScreen = () => {
                     type='font-awesome-5'
                     name='headset'
                     color='black'
-                    onPress={() => navigation.navigate('ChatScreen')}
+                    onPress={() => navigation.navigate('ChatStack')}
 
                 />
                 <Icon
