@@ -21,7 +21,7 @@ const TaskView = ({ route }) => {
     const getTask = useEffect(() => {
         const data = async () => {
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch('http://192.168.1.9:8000/api/task', {
+            const ress = await fetch('http://10.0.3.67:8000/api/task', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ const TaskView = ({ route }) => {
         }
         data()
         setTask([])
-    }, [])
+    }, [viewport])
     const navigation = useNavigation()
     return (
         <ScrollView

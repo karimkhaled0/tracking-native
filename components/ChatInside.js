@@ -9,8 +9,25 @@ import { TextInput } from 'react-native-gesture-handler';
 import EmojiPicker from 'rn-emoji-keyboard';
 import { useState } from 'react';
 import { useRef } from 'react';
-
+import { io } from "socket.io-client";
+import { useEffect } from 'react';
+const socket = io("http://10.0.3.67:8000");
+let allChat = []
 const ChatInside = ({ route }) => {
+    const [bob, setBob] = useState(false)
+
+    const sendRoomId = useEffect(() => {
+        const data = {
+            roomId: route.params.roomId
+        }
+        socket.emit('roomId', data)
+    }, [])
+    socket.on("msg:get", (data) => {
+        for (let index = 0; index < data.msg.messages.length; index++) {
+            allChat[index] = data.msg.messages[index]
+        }
+    });
+    console.log(allChat)
     // Emoji Handler
     const [isOpen, setIsOpen] = useState(false)
     const flatList = useRef(null)
@@ -19,30 +36,14 @@ const ChatInside = ({ route }) => {
     const [typeEmoji, setTypeEmoji] = useState('')
 
     const navigation = useNavigation()
-    const mockWhatsAppData = (count = 50) => {
-        return Array(count)
-            .fill(0)
-            .map((_, index) => ({
-                id: index + 1,
-                pastMessages: faker.lorem.sentence(10),
-                fromMe: Math.random() < 0.5,
 
-            }))
-    }
-    const data = useMemo(() => mockWhatsAppData(50), []);
-    // Push last message To Chat
-    data[50] = {
-        id: 51,
-        fromMe: true,
-        pastMessages: route.params.message
-    }
     const handleSend = () => {
-        data.push({
-            id: faker.datatype.number(),
-            fromMe: true,
-            pastMessages: typeMessage + typeEmoji
-        })
-        console.log(data)
+        let data = {
+            author: route.params.myId,
+            content: typeMessage,
+            roomId: route.params.roomId
+        }
+        socket.emit('msg:post', data)
         setTypeMessage('')
     }
     return (
@@ -126,15 +127,16 @@ const ChatInside = ({ route }) => {
                 <FlatList
                     style={tw.style('', {
                     })}
-                    data={data}
-                    keyExtractor={(item) => item.id}
+                    data={allChat}
+                    extraData={allChat}
+                    keyExtractor={(item) => item._id}
                     renderItem={({ item }) => {
                         return (
-                            item.fromMe ? (
+                            item.author == route.params.myId ? (
                                 // My Message
                                 <View
                                     style={tw.style('mb-2', styles.containerFromMe, {
-                                        alignItems: item.fromMe ? 'flex-end' : 'flex-start'
+                                        alignItems: item.author == route.params.myId ? 'flex-end' : 'flex-start'
                                     })}
                                 >
                                     <View
@@ -144,7 +146,7 @@ const ChatInside = ({ route }) => {
                                     >
                                         <Text
                                             style={tw.style('text-white', styles.msessage)}
-                                        >{item.pastMessages}</Text>
+                                        >{item.content}</Text>
                                     </View>
                                 </View>
                             ) : (
@@ -166,7 +168,7 @@ const ChatInside = ({ route }) => {
                                     >
                                         <Text
                                             style={tw.style('', styles.msessage)}
-                                        >{item.pastMessages}</Text>
+                                        >{item.content}</Text>
                                     </View>
                                 </View>
                             )

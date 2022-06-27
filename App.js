@@ -24,6 +24,7 @@ import * as Location from 'expo-location';
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const AuthContext = createContext();
+import { io } from "socket.io-client";
 const wait = timeout => {
   return new Promise(resolve => setTimeout(resolve, timeout));
 };
@@ -113,7 +114,7 @@ function LoginScreen() {
   const submitForm = async () => {
     setloginIdErr('')
     setPasswordErr('')
-    const res = await fetch('http://192.168.1.9:8000/signin', {
+    const res = await fetch('http://10.0.3.67:8000/signin', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ function LoginScreen() {
       // here i got the token and check if user change his password
       // before or not
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch(`http://192.168.1.9:8000/api/user/me`, {
+      const res = await fetch(`http://10.0.3.67:8000/api/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -258,7 +259,7 @@ function ChangePasswordScreen() {
   const loginHandler = useEffect(() => {
     const data = async () => {
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch(`http://192.168.1.9:8000/api/user/me`, {
+      const res = await fetch(`http://10.0.3.67:8000/api/user/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -278,7 +279,7 @@ function ChangePasswordScreen() {
     if (shouldChange) {
       if (password1 == password2) {
         if ((password1.length > 8 && password1.length < 16) && (password2.length > 8 && password2.length < 16)) {
-          const res = await fetch(`http://192.168.1.9:8000/api/user/changepassword`, {
+          const res = await fetch(`http://10.0.3.67:8000/api/user/changepassword`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -384,7 +385,7 @@ function ProfileScreen() {
   const getUserData = useEffect(() => {
     const data = async () => {
       let token = await SecureStore.getItemAsync('userToken');
-      const res = await fetch('http://192.168.1.9:8000/api/user/me', {
+      const res = await fetch('http://10.0.3.67:8000/api/user/me', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -405,7 +406,7 @@ function ProfileScreen() {
   console.log(userData)
   const updateUser = async () => {
     let token = await SecureStore.getItemAsync('userToken');
-    const res = await fetch(`http://192.168.1.9:8000/api/user/${userData[0]._id}`, {
+    const res = await fetch(`http://10.0.3.67:8000/api/user/${userData[0]._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -699,6 +700,8 @@ function ProfileScreen() {
 
 // App Tabs bottom
 export default function App() {
+  const socket = io("http://10.0.3.67:8000");
+
   // Use Reducer for tracking the user login or change his password for first time and also for sign out
   const [state, dispatch] = useReducer(
     (prevState, action) => {
@@ -752,7 +755,7 @@ export default function App() {
         // Restore token stored in `SecureStore` or any other encrypted storage
         // userToken = await SecureStore.getItemAsync('userToken');
         userToken = await SecureStore.getItemAsync('userToken');
-        const res = await fetch('http://192.168.1.9:8000/api/user/me', {
+        const res = await fetch('http://10.0.3.67:8000/api/user/me', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -808,6 +811,8 @@ export default function App() {
       setLocation(location);
     })();
   }, []);
+  socket.emit('location:get', location)
+
 
   return (
     <AuthContext.Provider value={authContext}>

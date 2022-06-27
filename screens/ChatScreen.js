@@ -1,5 +1,5 @@
 import { Text, View, SafeAreaView, TouchableOpacity, ScrollView, FlatList } from 'react-native'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { Icon } from '@rneui/base';
@@ -9,52 +9,49 @@ import { useState } from 'react';
 import ChatOutside from '../components/ChatOutside';
 import { faker } from '@faker-js/faker';
 import { format, parseISO } from 'date-fns'
+import { io } from "socket.io-client";
+import * as SecureStore from 'expo-secure-store';
 
+const socket = io("http://10.0.3.67:8000");
+let allChat = []
 const ChatScreen = () => {
+    socket.on("msg:get", (data) => {
+        for (let index = 0; index < data.msg.messages.length; index++) {
+            allChat[index] = data.msg.messages[index]
+        }
+    });
+    const [allRooms, setAllRooms] = useState([])
     const navigation = useNavigation()
     const [menu, setMenu] = useState(false)
-    const data = [
-        {
-            name: 'Karim Khaled',
-            date: '17/06/2022',
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: 'Ahmed yasser',
-            date: '16/06/2022',
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-        {
-            name: faker.name.firstName(),
-            date: format(parseISO(faker.date.past().toISOString().split('T')[0]), 'dd/MM/yyyy'),
-            message: faker.lorem.paragraph(),
-        },
-    ]
+    const [userData, setUserData] = useState('')
+
+    const getRooms = useEffect(() => {
+        const getRoom = async () => {
+            let token = await SecureStore.getItemAsync('userToken');
+            const ress = await fetch(`http://10.0.3.67:8000/api/user/me`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+            }).then((t) => t.json())
+            setUserData(ress.data)
+            const res = await fetch('http://10.0.3.67:8000/api/chat', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+            }).then((t) => t.json())
+            res.rooms.map((item) => {
+                if (item.members[1].name == ress.data.name) {
+                    return setAllRooms([item])
+                }
+            })
+        }
+        getRoom()
+    }, [])
+    console.log(allRooms)
     return (
         <SafeAreaView
             style={tw.style('bg-[#F8F8F8] h-full pt-10 mt-2', {
@@ -168,7 +165,7 @@ const ChatScreen = () => {
 
             {/* User chat */}
             <FlatList
-                data={data}
+                data={allRooms}
                 renderItem={({ item }) => {
                     return (
                         <TouchableOpacity
@@ -179,16 +176,15 @@ const ChatScreen = () => {
                             key={item.name}
                             onPress={() => {
                                 navigation.navigate('ChatInside', {
-                                    name: item.name,
-                                    data: item.date,
-                                    message: item.message
+                                    name: item.members[0].name,
+                                    roomId: item._id,
+                                    myId: userData._id
                                 })
                             }}
                         >
                             <ChatOutside
-                                name={item.name}
-                                date={item.date}
-                                message={item.message}
+                                name={item.members[0].name}
+                                message={item.lastMessage ? item.lastMessage : ''}
                             />
                         </TouchableOpacity>
                     )

@@ -6,11 +6,13 @@ import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
 const TaskStarted = ({ route }) => {
+    console.log(route.params.id)
     const navigation = useNavigation()
-    const taskStart = useEffect(() => {
+    const updateTask = useEffect(() => {
         const startTask = async () => {
+            console.log(route.params.id)
             let token = await SecureStore.getItemAsync('userToken');
-            const ress = await fetch(`http://192.168.1.9:8000/api/task/${route.params.id}`, {
+            const ress = await fetch(`http://10.0.3.67:8000/api/task/${route.params.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,9 +56,11 @@ const TaskStarted = ({ route }) => {
                 {tw.style('', {
                     justifyContent: "center",
                 })}>
-                <Button title="Back to home" onPress={() => navigation.navigate('HomeScreen', {
-                    refresh: 'paramPropValue'
-                })} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
+                <Button title="Back to home" onPress={() => {
+                    navigation.navigate('HomeScreen', {
+                        refresh: 'paramPropValue'
+                    })
+                }} type="solid" buttonStyle={tw`bg-[#4A649F] ml-12 mr-12 pt-3 pb-3 rounded-lg`} />
             </View>
         </View>
     )
